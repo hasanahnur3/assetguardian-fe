@@ -42,7 +42,7 @@ export default {
   components: { Line },
   data() {
     return {
-      years: ["2022", "2021"],
+      years: ["2022"],
       selectedYear: "2022",
       summary: {},
       lineChartData: {
@@ -68,7 +68,14 @@ export default {
     async retrieveCategoriesSummary() {
       await axios
         .get(
-          "https://ac780f41-cb23-4f7e-b82d-20715791d805.mock.pstmn.io/api/category/summary"
+          "https://be-asset-guardian.onrender.com/api/category/summary/" +
+            this.selectedYear,
+          {
+            headers: {
+              Accept: "application/json",
+              "User-Id": this.$store.state.userId,
+            },
+          }
         )
         .then((response) => {
           this.summary = response.data.summary;
@@ -304,7 +311,9 @@ export default {
     },
   },
   async mounted() {
-    console.log("aaaa");
+    if (this.$store.state.userId == 0) {
+      this.$router.push("/login");
+    }
     await this.retrieveCategoriesSummary();
     console.log(this.lineChartData);
   },

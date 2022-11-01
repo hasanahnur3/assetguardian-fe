@@ -38,43 +38,72 @@
       </div>
     </div>
     <div class="col-md-2 col-sm-12 chart-box">
-      <h3>Savings</h3>
-      <br>
-      <br>
+      <h3>Investment</h3>
+      <br />
+      <br />
 
       <div class="investment-box">
-        <p class="mr-4">
+        <p class="mr-4 text-left">
           Open Positon <br />
           Initial Amount
         </p>
-        <h5><b>500</b></h5>
+        <h5>
+          <b class="text-right">{{ investmentData.open_positions.total_initial_amount }}</b>
+        </h5>
       </div>
       <hr />
 
       <div class="investment-box">
-        <p class="mr-4">
+        <p class="mr-4 text-left">
           Open Positon <br />
-          Initial Amount
+          Current Amount
         </p>
-        <h5><b>500</b></h5>
+        <h5>
+          <b class="text-right">{{ investmentData.open_positions.total_current_amount }}</b>
+        </h5>
       </div>
       <hr />
 
       <div class="investment-box">
-        <p class="mr-4">
+        <p class="mr-4 text-left">
           Open Positon <br />
-          Initial Amount
+          Profit
         </p>
-        <h5><b>500</b></h5>
+        <h5>
+          <b class="text-right">{{ investmentData.open_positions.total_profit }}</b>
+        </h5>
       </div>
       <hr />
 
       <div class="investment-box">
-        <p class="mr-4">
-          Open Positon <br />
+        <p class="mr-4 text-left">
+          Close Positon <br />
           Initial Amount
         </p>
-        <h5><b>500</b></h5>
+        <h5>
+          <b class="text-right">{{ investmentData.close_positions.total_initial_amount }}</b>
+        </h5>
+      </div>
+      <hr />
+
+      <div class="investment-box">
+        <p class="mr-4 text-left">
+          Close Positon <br />
+          Current Amount
+        </p>
+        <h5>
+          <b class="text-right">{{ investmentData.close_positions.total_current_amount }}</b>
+        </h5>
+      </div>
+      <hr />
+      <div class="investment-box">
+        <p class="mr-4 text-left">
+          Close Positon <br />
+          Profit
+        </p>
+        <h5>
+          <b class="text-right">{{ investmentData.close_positions.total_profit }}</b>
+        </h5>
       </div>
       <hr />
     </div>
@@ -106,6 +135,18 @@ export default {
       debtTotal: 0,
       assetsTotal: 0,
       incomeTotal: 0,
+      investmentData: {
+        open_positions: {
+          total_initial_amount: 0,
+          total_current_amount: 0,
+          total_profit: 0,
+        },
+        close_positions: {
+          total_initial_amount: 0,
+          total_current_amount: 0,
+          total_profit: 0,
+        },
+      },
       savingsData: {
         labels: [],
         datasets: [
@@ -154,11 +195,27 @@ export default {
     };
   },
   methods: {
+    async retrieveInvestmentStats() {
+      await axios
+        .get("https://be-asset-guardian.onrender.com/api/position/stats/", {
+          headers: {
+            Accept: "application/json",
+            "User-Id": this.$store.state.userId,
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          this.investmentData = response.data.stats;
+        });
+    },
     async retrieveCategoriesStats() {
       await axios
-        .get(
-          "https://ac780f41-cb23-4f7e-b82d-20715791d805.mock.pstmn.io/api/category/stats"
-        )
+        .get("https://be-asset-guardian.onrender.com/api/category/stats/", {
+          headers: {
+            Accept: "application/json",
+            "User-Id": this.$store.state.userId,
+          },
+        })
         .then((response) => {
           this.categories = response;
 
@@ -232,11 +289,11 @@ export default {
     },
   },
   async mounted() {
-    console.log("aaaa");
+    if(this.$store.state.userId == 0){
+      this.$router.push("/login");
+    }
     await this.retrieveCategoriesStats();
-    console.log("bbb");
-    console.log(this.savingsData.labels);
-    console.log(this.savingsData.datasets);
+    await this.retrieveInvestmentStats();
   },
 };
 </script>

@@ -10,14 +10,14 @@ const routes = [{
         component: () =>
             import ("./components/Home")
     }, {
-        path: "/",
+        path: "/summary",
         alias: "/summary",
         name: "summary",
         component: () =>
             import ("./components/Summary")
     },
     {
-        path: "/",
+        path: "/input",
         alias: "/input",
         name: "input",
         component: () =>
@@ -31,11 +31,32 @@ const routes = [{
             import ("./components/OpenPosition")
     },
     {
-        path: "/",
+        path: "/investment/close",
         alias: "/investment/close",
         name: "close-position",
         component: () =>
             import ("./components/ClosePosition")
+    },
+    {
+        path: "/login",
+        alias: "/login",
+        name: "login",
+        component: () =>
+            import ("./components/Login")
+    },
+    {
+        path: "/register",
+        alias: "/register",
+        name: "register",
+        component: () =>
+            import ("./components/Register")
+    },
+    {
+        path: "/forgot-password",
+        alias: "/forgot-password",
+        name: "forgot-password",
+        component: () =>
+            import ("./components/ForgotPassword")
     }
 ];
 

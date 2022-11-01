@@ -5,6 +5,7 @@
       class="form-select mr-4"
       aria-label="Select Category"
       v-model="selectedCategory"
+      @change="changeCategory"
     >
       <option v-for="category in categories" :value="category" :key="category">
         {{ category }}
@@ -115,98 +116,16 @@
           <button
             class="btn btn-primary"
             data-toggle="modal"
-            data-target="#editModal"
+            @click="changeSelectedEntry(item)"
           >
             Edit
           </button>
-          <!-- Modal -->
-          <div
-            class="modal fade"
-            id="editModal"
-            tabindex="-1"
-            role="dialog"
-            aria-labelledby="exampleModalLabel"
-            aria-hidden="true"
-          >
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">
-                    Create a New Entry
-                  </h5>
-                  <button
-                    type="button"
-                    class="close"
-                    data-dismiss="modal"
-                    aria-label="Close"
-                  >
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  <div class="submit-form">
-                    <div class="form-group">
-                      <label for="name">Name</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="name"
-                        required
-                        v-model="item.name"
-                        name="name"
-                      />
-                    </div>
-
-                    <div class="form-group">
-                      <label for="date">Date</label>
-                      <input
-                        type="date"
-                        class="form-control"
-                        id="date"
-                        required
-                        v-model="item.date"
-                        name="date"
-                      />
-                    </div>
-
-                    <div class="form-group">
-                      <label for="amount">Amount</label>
-                      <input
-                        type="number"
-                        class="form-control"
-                        id="amount"
-                        required
-                        v-model="item.amount"
-                        name="amount"
-                      />
-                    </div>
-
-                    <button
-                      @click="
-                        editEntry(
-                          item.id,
-                          item.date,
-                          item.amount,
-                          item.type,
-                          item.user_id
-                        )
-                      "
-                      class="btn btn-success"
-                      data-dismiss="modal"
-                    >
-                      Submit
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </td>
         <td>
           <button
             type="button"
             class="btn btn-primary"
-            @click="deleteEntry(item.id)"
+            @click="deleteEntry(item)"
           >
             Delete
           </button>
@@ -214,11 +133,85 @@
       </tr>
     </tbody>
   </DataTable>
+  <!-- Modal -->
+  <div
+    class="modal fade"
+    id="editModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+    :key="isReady"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit an Entry</h5>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="submit-form">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                required
+                v-model="selectedEntry.name"
+                name="name"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="date">Date</label>
+              <input
+                type="date"
+                class="form-control"
+                id="date"
+                required
+                v-model="selectedEntry.date"
+                name="date"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="amount">Amount</label>
+              <input
+                type="number"
+                class="form-control"
+                id="amount"
+                required
+                v-model="selectedEntry.amount"
+                name="amount"
+              />
+            </div>
+
+            <button
+              @click="editEntry(this.selectedEntry)"
+              class="btn btn-success"
+              data-dismiss="modal"
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 import axios from "axios";
 import DataTable from "datatables.net-vue3";
+import $ from "jquery";
 
 export default {
   name: "input-page",
@@ -234,13 +227,25 @@ export default {
         date: "",
         amount: 0,
       },
+      selectedEntry: {},
     };
   },
   methods: {
+    changeSelectedEntry(item) {
+      this.selectedEntry = item;
+      $("#editModal").modal();
+    },
     async retrieveCategoryEntries() {
       await axios
         .get(
-          "https://ac780f41-cb23-4f7e-b82d-20715791d805.mock.pstmn.io/api/category"
+          "https://be-asset-guardian.onrender.com/api/category/" +
+            this.selectedCategory,
+          {
+            headers: {
+              Accept: "application/json",
+              "User-Id": this.$store.state.userId,
+            },
+          }
         )
         .then((response) => {
           this.items = response.data.category;
@@ -249,26 +254,96 @@ export default {
           console.log(error);
         });
     },
-    saveNewEntry() {
-      console.log("calledd");
+    async saveNewEntry() {
+      this.ready = false;
+      if (this.selectedCategory == "savings") this.newEntry.type = 1;
+      else if (this.selectedCategory == "expenses") this.newEntry.type = 2;
+      else if (this.selectedCategory == "debts") this.newEntry.type = 3;
+      else if (this.selectedCategory == "assets") this.newEntry.type = 4;
+      else if (this.selectedCategory == "income") this.newEntry.type = 5;
+
+      try {
+        await axios
+          .post(
+            "https://be-asset-guardian.onrender.com/api/category/",
+            this.newEntry,
+            {
+              headers: {
+                Accept: "application/json",
+                "User-Id": this.$store.state.userId,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response.data.category);
+            alert(this.selectedCategory + " new entry created successfully!");
+            this.items.push(response.data.category);
+          });
+      } catch (err) {
+        alert("Error!");
+      }
+      this.$nextTick().then(() => (this.ready = true));
     },
-    editEntry(id, date, amount, type, user_id) {
-      console.log(id);
-      console.log(date);
-      console.log(amount);
-      console.log(type);
-      console.log(user_id);
-      alert("Success Edit");
+    async editEntry(item) {
+      this.ready = false;
+      try {
+        await axios
+          .put(
+            "https://be-asset-guardian.onrender.com/api/category/" + item.id,
+            item,
+            {
+              headers: {
+                Accept: "application/json",
+                "User-Id": this.$store.state.userId,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response.data.category);
+            alert(this.selectedCategory + " entry edited successfully!");
+          });
+      } catch (err) {
+        alert("Error!");
+      }
+      this.$nextTick().then(() => (this.ready = true));
     },
-    deleteEntry(id) {
-      console.log(id);
-      alert("Success Delete");
+    async deleteEntry(item) {
+      this.ready = false;
+      try {
+        await axios
+          .delete(
+            "https://be-asset-guardian.onrender.com/api/category/" + item.id,
+            {
+              headers: {
+                Accept: "application/json",
+                "User-Id": this.$store.state.userId,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response.data.category);
+            alert(this.selectedCategory + " entry deleted successfully!");
+            const idx = this.items.indexOf(item);
+            if (idx > -1) {
+              this.items.splice(idx, 1);
+            }
+          });
+      } catch (err) {
+        alert("Error!");
+      }
+      this.$nextTick().then(() => (this.ready = true));
+    },
+    async changeCategory() {
+      this.ready = false;
+      await this.retrieveCategoryEntries();
+      this.$nextTick().then(() => (this.ready = true));
     },
   },
   async mounted() {
-    console.log("aaaa");
+    if (this.$store.state.userId == 0) {
+      this.$router.push("/login");
+    }
     await this.retrieveCategoryEntries();
-    console.log("bbb");
     console.log(this.items);
 
     this.$nextTick().then(() => (this.ready = true));

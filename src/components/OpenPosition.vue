@@ -153,125 +153,16 @@
               class="btn btn-primary"
               data-toggle="modal"
               data-target="#editOpenModal"
+              @click="changeSelectedEntry(item)"
             >
               Edit
             </button>
-            <!-- Modal -->
-            <div
-              class="modal fade"
-              id="editOpenModal"
-              tabindex="-1"
-              role="dialog"
-              aria-labelledby="exampleModalLabel"
-              aria-hidden="true"
-            >
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">
-                      CEdit Open Position Entry
-                    </h5>
-                    <button
-                      type="button"
-                      class="close"
-                      data-dismiss="modal"
-                      aria-label="Close"
-                    >
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="submit-form">
-                      <div class="form-group">
-                        <label for="open-name">Name</label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="open-name"
-                          required
-                          v-model="item.name"
-                        />
-                      </div>
-
-                      <div class="form-group">
-                        <label for="open-date-purchase">Date Purchase</label>
-                        <input
-                          type="date"
-                          class="form-control"
-                          id="dopen-ate-purchase"
-                          required
-                          v-model="item.date_purchased"
-                        />
-                      </div>
-
-                      <div class="form-group">
-                        <label for="open-purchase-price">Purchase Price</label>
-                        <input
-                          type="number"
-                          class="form-control"
-                          id="open-purchase-price"
-                          required
-                          v-model="item.purchase_price"
-                          name="amount"
-                        />
-                      </div>
-
-                      <div class="form-group">
-                        <label for="open-number-of-shares"
-                          >Number of Shares</label
-                        >
-                        <input
-                          type="number"
-                          class="form-control"
-                          id="open-number-of-shares"
-                          required
-                          v-model="item.number_of_shares"
-                          name="amount"
-                        />
-                      </div>
-
-                      <div class="form-group">
-                        <label for="open-initial-amount">Initial Amount</label>
-                        <input
-                          type="number"
-                          class="form-control"
-                          id="open-initial-amount"
-                          required
-                          v-model="item.initial_amount"
-                          name="amount"
-                        />
-                      </div>
-
-                      <div class="form-group">
-                        <label for="open-initial-amount">Current Price</label>
-                        <input
-                          type="number"
-                          class="form-control"
-                          id="open-initial-amount"
-                          required
-                          v-model="item.initial_amount"
-                          name="amount"
-                        />
-                      </div>
-
-                      <button
-                        @click="editOpenPositionEntry()"
-                        class="btn btn-success"
-                        data-dismiss="modal"
-                      >
-                        Submit
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </td>
           <td>
             <button
               type="button"
               class="btn btn-primary"
-              @click="deleteOpenEntry(item.id)"
+              @click="deleteOpenEntry(item)"
             >
               Delete
             </button>
@@ -279,6 +170,115 @@
         </tr>
       </tbody>
     </DataTable>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="editOpenModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              Edit Open Position Entry
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="submit-form">
+              <div class="form-group">
+                <label for="open-name">Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="open-name"
+                  required
+                  v-model="this.selectedEntry.name"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="open-date-purchase">Date Purchase</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="open-date-purchase"
+                  required
+                  v-model="this.selectedEntry.date_purchased"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="open-purchase-price">Purchase Price</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="open-purchase-price"
+                  required
+                  v-model="this.selectedEntry.purchase_price"
+                  name="amount"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="open-number-of-shares">Number of Shares</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="open-number-of-shares"
+                  required
+                  v-model="this.selectedEntry.number_of_shares"
+                  name="amount"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="open-initial-amount">Initial Amount</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="open-initial-amount"
+                  required
+                  v-model="this.selectedEntry.initial_amount"
+                  name="amount"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="open-initial-amount">Current Price</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="open-initial-amount"
+                  required
+                  v-model="this.selectedEntry.current_price"
+                  name="amount"
+                />
+              </div>
+
+              <button
+                @click="editOpenPositionEntry()"
+                class="btn btn-success"
+                data-dismiss="modal"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -298,24 +298,104 @@ export default {
         purchase_price: "",
         number_of_shares: "",
         initial_amount: "",
+        current_price: "",
       },
+      selectedEntry: {},
       items: [],
       ready: false,
     };
   },
   methods: {
-    saveNewOpenPositionEntry() {
-      alert("create open");
+    changeSelectedEntry(item) {
+      console.log(item);
+      this.selectedEntry = item;
     },
-    deleteOpenEntry(id) {
-      alert(id);
+    async saveNewOpenPositionEntry() {
+      this.ready = false;
+      this.newOpenPositionEntry.current_price =
+        this.newOpenPositionEntry.purchase_price;
+
+      try {
+        await axios
+          .post(
+            "https://be-asset-guardian.onrender.com/api/position/open/",
+            this.newOpenPositionEntry,
+            {
+              headers: {
+                Accept: "application/json",
+                "User-Id": this.$store.state.userId,
+              },
+            }
+          )
+          .then((response) => {
+            alert("Open investment new entry created successfully!");
+            this.items.push(response.data.open_position);
+          });
+      } catch (err) {
+        alert("Error!");
+      }
+      this.$nextTick().then(() => (this.ready = true));
     },
-    editOpenPositionEntry() {},
+    async deleteOpenEntry(item) {
+      this.ready = false;
+      try {
+        await axios
+          .delete(
+            "https://be-asset-guardian.onrender.com/api/position/open/" +
+              item.id,
+            {
+              headers: {
+                Accept: "application/json",
+                "User-Id": this.$store.state.userId,
+              },
+            }
+          )
+          .then((response) => {
+            if (response.data.message.includes("has been deleted")) {
+              alert("Open position entry deleted successfully!");
+              const idx = this.items.indexOf(item);
+              if (idx > -1) {
+                this.items.splice(idx, 1);
+              }
+            }
+          });
+      } catch (err) {
+        alert("Error!");
+      }
+      this.$nextTick().then(() => (this.ready = true));
+    },
+    async editOpenPositionEntry() {
+      this.ready = false;
+      try {
+        await axios
+          .put(
+            "https://be-asset-guardian.onrender.com/api/position/open/" +
+              this.selectedEntry.id,
+            this.selectedEntry,
+            {
+              headers: {
+                Accept: "application/json",
+                "User-Id": this.$store.state.userId,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response.data.open_position);
+            alert("Open investment entry edited successfully!");
+          });
+      } catch (err) {
+        alert("Error!");
+      }
+      this.$nextTick().then(() => (this.ready = true));
+    },
     async retrieveOpenPositionEntries() {
       await axios
-        .get(
-          "https://ac780f41-cb23-4f7e-b82d-20715791d805.mock.pstmn.io/api/position/open"
-        )
+        .get("https://be-asset-guardian.onrender.com/api/position/open", {
+          headers: {
+            Accept: "application/json",
+            "User-Id": this.$store.state.userId,
+          },
+        })
         .then((response) => {
           this.items = response.data.open_position;
         })
@@ -324,15 +404,17 @@ export default {
         });
     },
     changeSelectedCategory(category) {
-      alert("!!!!");
-      if(category == "open position"){
-        this.$router.push('open') 
-      }else{
-        this.$router.push('close') 
+      if (category == "open position") {
+        this.$router.push("open");
+      } else {
+        this.$router.push("close");
       }
     },
   },
   async mounted() {
+    if (this.$store.state.userId == 0) {
+      this.$router.push("/login");
+    }
     await this.retrieveOpenPositionEntries();
     this.$nextTick().then(() => (this.ready = true));
   },
